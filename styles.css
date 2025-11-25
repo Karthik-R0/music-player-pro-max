@@ -461,60 +461,6 @@ html, body {
   box-shadow: var(--glow-primary);
 }
 
-/* Modern Drop Zone */
-.modern-drop-zone {
-  border: 2px dashed var(--border-color);
-  border-radius: 16px;
-  padding: 30px 20px;
-  text-align: center;
-  margin-bottom: 16px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  background: var(--card-bg);
-}
-
-.drop-content {
-  pointer-events: none;
-}
-
-.drop-icon-large {
-  width: 56px;
-  height: 56px;
-  color: var(--primary-color);
-  margin: 0 auto 16px;
-  opacity: 0.7;
-}
-
-.modern-drop-zone h3 {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 6px;
-  color: var(--text-primary);
-}
-
-.modern-drop-zone p {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.modern-drop-zone.dragover {
-  border-color: var(--primary-color);
-  background: rgba(0, 217, 255, 0.1);
-  transform: scale(1.02);
-  box-shadow: var(--glow-primary);
-}
-
-.modern-drop-zone.dragover .drop-icon-large {
-  opacity: 1;
-  animation: bounce 0.6s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
 /* Playlist Scroll Container */
 .playlist-scroll-container {
   flex: 1;
@@ -640,30 +586,31 @@ font-weight: 500;
 }
 /* Main Player Section */
 .main-player-section {
-background: var(--glass-bg);
-backdrop-filter: blur(20px);
-border-radius: 20px;
-border: 1px solid var(--border-color);
-padding: 40px;
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-box-shadow: var(--shadow-lg);
-overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  padding: 30px 40px; /* Reduced top/bottom padding */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Changed from space-between */
+  box-shadow: var(--shadow-lg);
+  overflow-y: auto; /* Allow scrolling if content overflows */
+  overflow-x: hidden;
 }
 /* Player Display Area */
 .player-display-area {
-display: flex;
-flex-direction: column;
-align-items: center;
-margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px; /* Reduced from 30px */
 }
 /* Album Artwork */
 .album-artwork-wrapper {
-position: relative;
-width: 320px;
-height: 320px;
-margin-bottom: 32px;
+  position: relative;
+  width: 260px; /* Reduced from 320px */
+  height: 260px; /* Reduced from 320px */
+  margin-bottom: 24px; /* Reduced from 32px */
 }
 .album-art-inner {
 width: 100%;
@@ -753,10 +700,10 @@ font-weight: 500;
 }
 /* Progress Control Section */
 .progress-control-section {
-display: flex;
-align-items: center;
-gap: 16px;
-margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px; /* Reduced from 32px */
 }
 .time-display {
 min-width: 50px;
@@ -818,7 +765,7 @@ z-index: 3;
 }
 /* Player Controls */
 .player-controls-section {
-margin-bottom: 28px;
+  margin-bottom: 20px; /* Reduced from 28px */
 }
 .control-buttons-group {
 display: flex;
@@ -892,12 +839,12 @@ height: 28px;
 }
 /* Additional Controls */
 .additional-controls-row {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 20px 0;
-border-top: 1px solid var(--border-color);
-margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0; /* Reduced from 20px */
+  border-top: 1px solid var(--border-color);
+  margin-bottom: 16px; /* Reduced from 20px */
 }
 /* Volume Control */
 .volume-control-group {
@@ -987,12 +934,13 @@ box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
 }
 /* Visualizer Section */
 .visualizer-section {
-position: relative;
-height: 120px;
-background: var(--card-bg);
-border-radius: 16px;
-overflow: hidden;
-border: 1px solid var(--border-color);
+  position: relative;
+  height: 100px; /* Reduced from 120px */
+  background: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  margin-top: auto; /* Push to bottom if there's extra space */
 }
 .visualizer-canvas {
 width: 100%;
@@ -1063,8 +1011,9 @@ font-weight: 700;
 color: var(--text-primary);
 }
 .queue-list-container {
-flex: 1;
-overflow-y: auto;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 200px; /* Added minimum height */
 }
 .queue-list-container::-webkit-scrollbar {
 width: 6px;
@@ -1097,9 +1046,10 @@ font-weight: 500;
 }
 /* Player Stats */
 .player-stats-section {
-margin-top: auto;
-padding-top: 20px;
-border-top: 1px solid var(--border-color);
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  min-height: 160px; /* Added minimum height to ensure visibility */
 }
 .stats-title {
 font-size: 14px;
@@ -1110,14 +1060,15 @@ text-transform: uppercase;
 letter-spacing: 1px;
 }
 .stat-item {
-display: flex;
-align-items: center;
-gap: 12px;
-padding: 12px;
-background: var(--card-bg);
-border-radius: 10px;
-margin-bottom: 10px;
-border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 12px; /* Increased padding */
+  background: var(--card-bg);
+  border-radius: 10px;
+  margin-bottom: 12px; /* Increased margin */
+  border: 1px solid var(--border-color);
+  min-height: 56px; /* Added minimum height */
 }
 .stat-item i {
 width: 20px;
@@ -1270,9 +1221,15 @@ max-height: 500px;
 }
 }
 @media (max-width: 768px) {
-.app-wrapper {
-padding: 0;
-}
+  html, body {
+    height: auto; /* Allow body to expand */
+    min-height: 100vh; /* Minimum full viewport height */
+  }
+  
+  .app-wrapper {
+    padding: 0;
+    min-height: 100vh; /* Ensure wrapper takes full height */
+  }
 .glass-header {
 border-radius: 0;
 margin-bottom: 0;
@@ -1354,6 +1311,72 @@ max-width: none;
 .visualizer-section {
 height: 100px;
 }
+
+.sidebar-playlist {
+    min-height: 400px; /* Ensure playlist has minimum height */
+    max-height: 500px; /* Keep existing max height */
+  }
+  
+  .playlist-scroll-container {
+    min-height: 250px; /* Ensure tracks list is scrollable */
+  }
+  
+.sidebar-queue {
+    min-height: 450px; /* Increased from 350px */
+    padding-bottom: 30px; /* Added bottom padding */
+  }
+  
+.queue-list-container {
+    min-height: 200px; /* Increased from 180px */
+    max-height: 280px; /* Increased from 250px */
+    overflow-y: auto; /* Ensure scrolling */
+  }
+  
+.player-stats-section {
+    min-height: 300px important; /* Ensure stats section has enough height */
+    padding-top: -100px !important;/* Added bottom padding */
+  }
+  
+  .stats-title {
+    font-size: 15px !important; /* Increased from 14px */
+    margin-bottom: 18px !important; /* More spacing */
+  }
+  
+  .stat-item {
+    padding: 16px 14px !important; /* More padding for touch targets */
+    margin-bottom: 14px !important; /* More spacing between items */
+    min-height: 62px !important; /* Ensure minimum height */
+  }
+  
+  .stat-item i {
+    width: 24px !important; /* Larger icons */
+    height: 24px !important;
+  }
+  
+  .stat-label {
+    font-size: 15px !important; /* Larger text for readability */
+    font-weight: 600 !important; /* Bolder text */
+  }
+  
+  .stat-value {
+    font-size: 16px !important; /* Larger text for readability */
+    font-weight: 800 !important; /* Bolder numbers */
+  }
+
+/* Ensure proper spacing for queue items that are clickable */
+  .queue-list-container .stat-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .queue-list-container .stat-item:hover {
+    background: var(--hover-bg);
+    transform: translateX(4px);
+  }
+  
+  .queue-list-container .stat-item:active {
+    transform: scale(0.98);
+  }
 }
 @media (max-width: 480px) {
 .album-artwork-wrapper {
@@ -1384,3 +1407,31 @@ gap: 14px;
 }
 }
 
+@media (max-width: 480px) {
+  html, body {
+    min-height: 100vh;
+  }
+  
+  .sidebar-queue {
+    min-height: 480px; /* Even more height for very small screens */
+  }
+  
+  .queue-list-container {
+    min-height: 220px;
+    max-height: 300px;
+  }
+  
+  .player-stats-section {
+    min-height: 420px;
+   padding-bottom:50px;
+  }
+  
+  .stat-item {
+    padding: 18px 16px !important;
+    min-height: 68px !important;
+  }
+  
+.album-artwork-wrapper {
+width: 200px;
+height: 200px;
+}

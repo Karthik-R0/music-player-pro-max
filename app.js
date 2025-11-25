@@ -1,7 +1,6 @@
 // DOM Elements
 const fileInput = document.getElementById('fileInput');
 const folderBtn = document.getElementById('folderBtn');
-const dropZone = document.getElementById('dropZone');
 const playlist = document.getElementById('playlist');
 const audio = document.getElementById('audio');
 const playPauseBtn = document.getElementById('playPauseBtn');
@@ -160,24 +159,7 @@ function setupEventListeners() {
   });
   
   folderBtn.addEventListener('click', handleFolderSelect);
-  
-  ['dragenter', 'dragover'].forEach(evt => {
-    dropZone.addEventListener(evt, e => {
-      e.preventDefault();
-      dropZone.classList.add('dragover');
-    });
-  });
-  
-  ['dragleave', 'drop'].forEach(evt => {
-    dropZone.addEventListener(evt, e => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-    });
-  });
-  
-  dropZone.addEventListener('drop', e => {
-    handleFiles(e.dataTransfer.files);
-  });
+ 
   
   playPauseBtn.addEventListener('click', togglePlayPause);
   prevBtn.addEventListener('click', playPrevious);
@@ -376,12 +358,13 @@ function renderPlaylist() {
       )
     : [...tracks];
   
-  // Sort
+  // Sort - FIXED LOGIC
   if (currentSort === 'name') {
     filtered.sort((a, b) => a.name.localeCompare(b.name));
   } else if (currentSort === 'duration') {
     filtered.sort((a, b) => (b.duration || 0) - (a.duration || 0));
   }
+  // If currentSort === 'default', keep original order (no sorting)
   
   playlist.innerHTML = '';
   
@@ -398,7 +381,9 @@ function renderPlaylist() {
   
   filtered.forEach((track, idx) => {
     const li = document.createElement('li');
-    const actualIndex = tracks.indexOf(track);
+    
+    // FIXED: Find actual index in original tracks array
+    const actualIndex = tracks.findIndex(t => t.url === track.url);
     
     if (actualIndex === currentIndex) {
       li.classList.add('active');
@@ -425,6 +410,7 @@ function renderPlaylist() {
   lucide.createIcons();
   clearSearchBtn.classList.toggle('show', searchTerm.length > 0);
 }
+
 
 function updateStats() {
   const total = tracks.reduce((sum, t) => sum + (t.duration || 0), 0);
