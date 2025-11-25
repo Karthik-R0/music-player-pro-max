@@ -66,6 +66,9 @@ function init() {
   setupEventListeners();
   resizeCanvas();
   
+  // Set initial play/pause button state
+  updatePlayPauseButton();
+  
   // Wait a bit for async loadFromLocalStorage to complete
   setTimeout(() => {
     updateStats();
@@ -87,9 +90,9 @@ function init() {
     
     // Update volume display
     updateVolumeDisplay();
+    updatePlayPauseButton(); // Update again after loading
   }, 100);
 }
-
 
 // Local Storage Functions
 function saveToLocalStorage() {
@@ -596,9 +599,14 @@ function togglePlayPause() {
     loadTrack(0);
     play();
   } else if (audio.src) {
-    isPlaying ? pause() : play();
+    if (isPlaying) {
+      pause();
+    } else {
+      play();
+    }
   }
 }
+
 
 function play() {
   if (!audioContext) {
@@ -611,11 +619,15 @@ function play() {
   
   audio.play();
   albumArtInner.classList.add('playing');
+  isPlaying = true;
+  updatePlayPauseButton();
 }
 
 function pause() {
   audio.pause();
   albumArtInner.classList.remove('playing');
+  isPlaying = false;
+  updatePlayPauseButton();
 }
 
 function playNext() {
@@ -740,13 +752,23 @@ function onTrackEnded() {
   }
 }
 
-function updatePlayPauseButton() {
-  const icon = playPauseBtn.querySelector('i');
-  if (icon) {
-    icon.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
+function updatePlayPauseButton() {  
+  const playBtnInner = playPauseBtn.querySelector('.play-btn-inner');
+  if (playBtnInner) {
+    // Remove old icon
+    playBtnInner.innerHTML = '';
+    
+    // Create new icon element
+    const newIcon = document.createElement('i');
+    const iconType = isPlaying ? 'pause' : 'play';
+    newIcon.setAttribute('data-lucide', iconType);
+    playBtnInner.appendChild(newIcon);
+        
+    // Reinitialize Lucide icons
     lucide.createIcons();
   }
 }
+
 
 // Volume
 function updateVolumeDisplay() {
