@@ -54,29 +54,42 @@ let sessionTracksPlayed = 0;
 let sessionListeningTime = 0;
 let listeningInterval = null;
 
+// Equalizer State
+let eqFilters = [];
+let currentPreset = 'flat';
+
+
+
 // Initialize
 function init() {
   loadFromLocalStorage();
   setupEventListeners();
-  updateStats();
-  renderPlaylist();
   resizeCanvas();
-  updateQueueDisplay();
   
-  // Load saved state from localStorage
-  const savedCurrentIndex = parseInt(localStorage.getItem('currentTrackIndex') || '-1');
-  const savedCurrentTime = parseFloat(localStorage.getItem('currentTrackTime') || '0');
-  
-  if (savedCurrentIndex >= 0 && savedCurrentIndex < tracks.length) {
-    loadTrack(savedCurrentIndex);
-    if (savedCurrentTime) {
-      audio.currentTime = savedCurrentTime;
+  // Wait a bit for async loadFromLocalStorage to complete
+  setTimeout(() => {
+    updateStats();
+    renderPlaylist();
+    updateQueueDisplay();
+    
+    // Load saved state from localStorage only if tracks exist
+    if (tracks.length > 0) {
+      const savedCurrentIndex = parseInt(localStorage.getItem('currentTrackIndex') || '-1');
+      const savedCurrentTime = parseFloat(localStorage.getItem('currentTrackTime') || '0');
+      
+      if (savedCurrentIndex >= 0 && savedCurrentIndex < tracks.length) {
+        loadTrack(savedCurrentIndex);
+        if (savedCurrentTime && savedCurrentTime > 0) {
+          audio.currentTime = savedCurrentTime;
+        }
+      }
     }
-  }
-  
-  // Update volume display
-  updateVolumeDisplay();
+    
+    // Update volume display
+    updateVolumeDisplay();
+  }, 100);
 }
+
 
 // Local Storage Functions
 function saveToLocalStorage() {
@@ -111,14 +124,58 @@ function loadFromLocalStorage() {
     const trackData = JSON.parse(localStorage.getItem('musicPlayerTracks') || '[]');
     
     if (trackData.length > 0) {
-      console.log('Loading from localStorage:', trackData.length, 'tracks');
-      tracks = trackData.map(t => ({
-        ...t,
-        file: null // Files can't be stored, but we have the URL
-      }));
+      console.log('Attempting to load from localStorage:', trackData.length, 'tracks');
+      
+      // Check if blob URLs are still valid
+      if (trackData[0] && trackData[0].url && trackData[0].url.startsWith('blob:')) {
+        // Test if blob URL is still valid
+        const testAudio = new Audio();
+        testAudio.preload = 'metadata';
+        
+        testAudio.addEventListener('error', () => {
+          // Blob URLs are no longer valid
+          console.warn('⚠️ Audio files expired after page refresh.');
+          console.info('ℹ️ Please re-add your music files using the Folder or Add buttons.');
+          
+          // Clear expired data
+          localStorage.removeItem('musicPlayerTracks');
+          localStorage.removeItem('currentTrackIndex');
+          localStorage.removeItem('currentTrackTime');
+          tracks = [];
+          
+          updateStats();
+          renderPlaylist();
+          updateQueueDisplay();
+          
+          // Optional: Show user notification
+          showNotification('Audio files need to be re-added after page refresh', 'info');
+        });
+        
+        testAudio.addEventListener('loadedmetadata', () => {
+          // URLs are still valid (unlikely but possible in same session)
+          tracks = trackData.map(t => ({
+            ...t,
+            file: null
+          }));
+          updateStats();
+          renderPlaylist();
+          updateQueueDisplay();
+          console.log('✓ Successfully loaded tracks from localStorage');
+        });
+        
+        testAudio.src = trackData[0].url;
+        
+      } else {
+        // No valid URLs
+        console.warn('No valid track URLs found.');
+        localStorage.removeItem('musicPlayerTracks');
+        localStorage.removeItem('currentTrackIndex');
+        localStorage.removeItem('currentTrackTime');
+        tracks = [];
+      }
     }
     
-    // Load settings
+    // Load settings (these persist correctly)
     const settings = JSON.parse(localStorage.getItem('musicPlayerSettings') || '{}');
     if (settings.volume !== undefined) {
       audio.volume = settings.volume;
@@ -139,8 +196,91 @@ function loadFromLocalStorage() {
     }
   } catch (e) {
     console.error('Error loading from localStorage:', e);
+    // Clear potentially corrupted data
+    localStorage.removeItem('musicPlayerTracks');
+    localStorage.removeItem('currentTrackIndex');
+    localStorage.removeItem('currentTrackTime');
+    tracks = [];
   }
 }
+
+
+
+// Utility Functions
+function formatTime(seconds) {
+  if (!seconds || isNaN(seconds)) return '0:00';
+  
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  
+  if (hrs > 0) {
+    return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// ADD THIS NEW FUNCTION:
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: ${type === 'info' ? 'rgba(0, 217, 255, 0.95)' : 'rgba(255, 46, 99, 0.95)'};
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+    max-width: 300px;
+  `;
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  
+  // Remove after 5 seconds
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease-out';
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 300);
+  }, 5000);
+}
+
+// ADD THESE ANIMATIONS TO YOUR CSS:
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideIn {
+    from {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+  }
+`;
+document.head.appendChild(style);
+
+
 
 function savePlayerState() {
   try {
@@ -754,11 +894,157 @@ function initAudioContext() {
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioContext.createAnalyser();
   const source = audioContext.createMediaElementSource(audio);
-  source.connect(analyser);
+  
+  // Create equalizer filters
+  const frequencies = [60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000];
+  
+  frequencies.forEach(freq => {
+    const filter = audioContext.createBiquadFilter();
+    filter.type = 'peaking';
+    filter.frequency.value = freq;
+    filter.Q.value = 1;
+    filter.gain.value = 0;
+    eqFilters.push(filter);
+  });
+  
+  // Connect audio chain: source -> filters -> analyser -> destination
+  source.connect(eqFilters[0]);
+  
+  for (let i = 0; i < eqFilters.length - 1; i++) {
+    eqFilters[i].connect(eqFilters[i + 1]);
+  }
+  
+  eqFilters[eqFilters.length - 1].connect(analyser);
   analyser.connect(audioContext.destination);
+  
   analyser.fftSize = 256;
   dataArray = new Uint8Array(analyser.frequencyBinCount);
   canvasCtx = visualizerCanvas.getContext('2d');
+  
+  // Initialize equalizer UI
+  initEqualizerUI();
+}
+
+
+
+function setupEQPresets() {
+  const presetButtons = document.querySelectorAll('.eq-preset-btn');
+  
+  presetButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const preset = btn.dataset.preset;
+      applyEQPreset(preset);
+      
+      // Update active button
+      presetButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      currentPreset = preset;
+    });
+  });
+}
+
+
+function applyEQPreset(preset) {
+  const presets = {
+    flat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    pop: [1, 3, 5, 4, 2, 0, -1, -1, 1, 2],
+    rock: [5, 3, 1, 0, -1, 1, 3, 4, 5, 5],
+    jazz: [4, 3, 1, 2, -1, -1, 0, 2, 3, 4],
+    classical: [5, 4, 3, 2, -1, -1, 0, 2, 3, 4]
+  };
+  
+  const values = presets[preset] || presets.flat;
+  
+  values.forEach((value, index) => {
+    if (eqFilters[index]) {
+      eqFilters[index].gain.value = value;
+    }
+    
+    // Update UI sliders
+    const slider = document.querySelector(`.eq-slider[data-index="${index}"]`);
+    const valueDisplay = slider?.parentElement.querySelector('.eq-value');
+    
+    if (slider) {
+      slider.value = value;
+      if (valueDisplay) {
+        valueDisplay.textContent = `${value > 0 ? '+' : ''}${value.toFixed(1)}dB`;
+      }
+    }
+  });
+}
+
+
+// Add touch support for better mobile experience
+function enhanceEQMobileSupport() {
+  const sliders = document.querySelectorAll('.eq-slider');
+  
+  sliders.forEach(slider => {
+    // Prevent default touch behavior for better control
+    slider.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+    }, { passive: true });
+    
+    slider.addEventListener('touchmove', (e) => {
+      e.stopPropagation();
+    }, { passive: true });
+  });
+}
+
+
+function initEqualizerUI() {
+  const eqSliders = document.getElementById('eqSliders');
+  const frequencies = ['60Hz', '170Hz', '310Hz', '600Hz', '1kHz', '3kHz', '6kHz', '12kHz', '14kHz', '16kHz'];
+  
+  eqSliders.innerHTML = '';
+  
+  frequencies.forEach((freq, index) => {
+    const sliderContainer = document.createElement('div');
+    sliderContainer.className = 'eq-slider-container';
+    sliderContainer.innerHTML = `
+      <input 
+        type="range" 
+        class="eq-slider" 
+        min="-12" 
+        max="12" 
+        value="0" 
+        step="0.1" 
+        data-index="${index}"
+        orient="vertical"
+      />
+      <span class="eq-value">0dB</span>
+      <span class="eq-label">${freq}</span>
+    `;
+    
+    eqSliders.appendChild(sliderContainer);
+    
+    // Add event listener
+    const slider = sliderContainer.querySelector('.eq-slider');
+    const valueDisplay = sliderContainer.querySelector('.eq-value');
+    
+    slider.addEventListener('input', (e) => {
+      const value = parseFloat(e.target.value);
+      valueDisplay.textContent = `${value > 0 ? '+' : ''}${value.toFixed(1)}dB`;
+      
+      if (eqFilters[index]) {
+        eqFilters[index].gain.value = value;
+      }
+      
+      // Update preset to custom if user adjusts manually
+      if (currentPreset !== 'custom') {
+        currentPreset = 'custom';
+        document.querySelectorAll('.eq-preset-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+      }
+    });
+  });
+  
+// Setup preset buttons
+  setupEQPresets();
+  
+  // Enhance mobile support
+  enhanceEQMobileSupport();
 }
 
 function startVisualizer() {

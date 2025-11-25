@@ -207,6 +207,7 @@ html, body {
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center; /* Added to center content */
   gap: 8px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -1110,15 +1111,30 @@ padding: 20px;
 display: flex;
 }
 .modal-content {
-background: var(--glass-bg);
-backdrop-filter: blur(20px);
-border-radius: 20px;
-border: 1px solid var(--border-color);
-padding: 30px;
-max-width: 600px;
-width: 100%;
-box-shadow: var(--shadow-xl);
-animation: modal-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  padding: 30px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  animation: modal-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 217, 255, 0.3);
+  border-radius: 10px;
 }
 @keyframes modal-in {
 from { opacity: 0; transform: scale(0.9); }
@@ -1188,9 +1204,31 @@ box-shadow: var(--glow-primary);
 }
 /* EQ Sliders */
 .eq-sliders {
-display: flex;
-gap: 20px;
-justify-content: space-between;
+  display: flex;
+  gap: 15px;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 20px 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.eq-sliders::-webkit-scrollbar {
+  height: 6px;
+}
+
+.eq-sliders::-webkit-scrollbar-track {
+  background: var(--card-bg);
+  border-radius: 10px;
+}
+
+.eq-sliders::-webkit-scrollbar-thumb {
+  background: rgba(0, 217, 255, 0.3);
+  border-radius: 10px;
+}
+
+.eq-sliders::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 217, 255, 0.5);
 }
 /* Mobile Responsive */
 @media (max-width: 1400px) {
@@ -1222,162 +1260,263 @@ max-height: 500px;
 }
 @media (max-width: 768px) {
   html, body {
-    height: auto; /* Allow body to expand */
-    min-height: 100vh; /* Minimum full viewport height */
+    height: auto;
+    min-height: 100vh;
   }
   
   .app-wrapper {
     padding: 0;
-    min-height: 100vh; /* Ensure wrapper takes full height */
+    min-height: 100vh;
   }
-.glass-header {
-border-radius: 0;
-margin-bottom: 0;
-padding: 16px 20px;
-flex-wrap: wrap;
-gap: 12px;
-}
-.logo-icon-wrapper {
-width: 40px;
-height: 40px;
-}
-.logo-icon {
-width: 22px;
-height: 22px;
-}
-.logo-text h1 {
-font-size: 20px;
-}
-.logo-subtitle {
-font-size: 9px;
-}
-.header-actions {
-width: 100%;
-justify-content: space-between;
-}
+  
+  .glass-header {
+    border-radius: 0;
+    margin-bottom: 0;
+    padding: 16px 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .logo-icon-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .logo-icon {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .logo-text h1 {
+    font-size: 20px;
+  }
+  
+  .logo-subtitle {
+    font-size: 9px;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
 .action-btn {
-flex: 1;
-padding: 10px 16px;
-font-size: 13px;
-}
-.action-btn span {
-display: none;
-}
-.main-container {
-gap: 0;
-}
-.sidebar-playlist,
-.main-player-section,
-.sidebar-queue {
-border-radius: 0;
-border-left: none;
-border-right: none;
-border-top: 1px solid var(--border-color);
-}
-.main-player-section {
-padding: 30px 20px;
-}
-.album-artwork-wrapper {
-width: 240px;
-height: 240px;
-}
-.current-track-title {
-font-size: 22px;
-}
-.current-track-artist {
-font-size: 16px;
-}
-.control-button {
-width: 48px;
-height: 48px;
-}
-.play-btn-main {
-width: 64px;
-height: 64px;
-}
-.additional-controls-row {
-flex-direction: column;
-gap: 16px;
-align-items: stretch;
-}
-.volume-control-group,
-.speed-control-group {
-justify-content: space-between;
-}
-.volume-slider-wrapper {
-flex: 1;
-max-width: none;
-}
-.visualizer-section {
-height: 100px;
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 13px;
+  justify-content: center; /* Center icons when text is hidden */
+  align-items: center; /* Ensure vertical centering */
 }
 
-.sidebar-playlist {
-    min-height: 400px; /* Ensure playlist has minimum height */
-    max-height: 500px; /* Keep existing max height */
+.action-btn span {
+  display: none;
+}
+
+/* Ensure icons are centered when span is hidden */
+.action-btn i {
+  margin: 0 auto; /* Center the icon */
+}
+  
+  .main-container {
+    gap: 0;
+  }
+  
+  .sidebar-playlist,
+  .main-player-section,
+  .sidebar-queue {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: 1px solid var(--border-color);
+  }
+  
+  .main-player-section {
+    padding: 30px 20px;
+  }
+  
+  .album-artwork-wrapper {
+    width: 240px;
+    height: 240px;
+  }
+  
+  .current-track-title {
+    font-size: 22px;
+  }
+  
+  .current-track-artist {
+    font-size: 16px;
+  }
+  
+  .control-button {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .play-btn-main {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .additional-controls-row {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .volume-control-group,
+  .speed-control-group {
+    justify-content: space-between;
+  }
+  
+  .volume-slider-wrapper {
+    flex: 1;
+    max-width: none;
+  }
+  
+  .visualizer-section {
+    height: 100px;
+  }
+  
+  .sidebar-playlist {
+    min-height: 400px;
+    max-height: 500px;
   }
   
   .playlist-scroll-container {
-    min-height: 250px; /* Ensure tracks list is scrollable */
+    min-height: 250px;
   }
   
-.sidebar-queue {
-    min-height: 450px; /* Increased from 350px */
-    padding-bottom: 30px; /* Added bottom padding */
+  /* Keep sidebar-queue visible but hide only the queue list */
+  .sidebar-queue {
+    min-height: auto !important;
+    padding: 24px;
   }
   
-.queue-list-container {
-    min-height: 200px; /* Increased from 180px */
-    max-height: 280px; /* Increased from 250px */
-    overflow-y: auto; /* Ensure scrolling */
+  /* HIDE only the Up Next header and queue list in mobile */
+  .queue-header {
+    display: none !important;
   }
   
-.player-stats-section {
-    min-height: 300px important; /* Ensure stats section has enough height */
-    padding-top: -100px !important;/* Added bottom padding */
+  .queue-list-container {
+    display: none !important;
+  }
+  
+  /* Ensure Session Stats remain visible and well-styled */
+  .player-stats-section {
+    display: block !important;
+    margin-top: 0 !important;
+    padding-top: 24px !important;
+    border-top: 1px solid var(--border-color);
+    min-height: 200px;
   }
   
   .stats-title {
-    font-size: 15px !important; /* Increased from 14px */
-    margin-bottom: 18px !important; /* More spacing */
+    font-size: 15px !important;
+    margin-bottom: 18px !important;
   }
   
   .stat-item {
-    padding: 16px 14px !important; /* More padding for touch targets */
-    margin-bottom: 14px !important; /* More spacing between items */
-    min-height: 62px !important; /* Ensure minimum height */
+    padding: 16px 14px !important;
+    margin-bottom: 14px !important;
+    min-height: 62px !important;
   }
   
   .stat-item i {
-    width: 24px !important; /* Larger icons */
+    width: 24px !important;
     height: 24px !important;
   }
   
   .stat-label {
-    font-size: 15px !important; /* Larger text for readability */
-    font-weight: 600 !important; /* Bolder text */
+    font-size: 15px !important;
+    font-weight: 600 !important;
   }
   
   .stat-value {
-    font-size: 16px !important; /* Larger text for readability */
-    font-weight: 800 !important; /* Bolder numbers */
-  }
-
-/* Ensure proper spacing for queue items that are clickable */
-  .queue-list-container .stat-item {
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .queue-list-container .stat-item:hover {
-    background: var(--hover-bg);
-    transform: translateX(4px);
-  }
-  
-  .queue-list-container .stat-item:active {
-    transform: scale(0.98);
+    font-size: 16px !important;
+    font-weight: 800 !important;
   }
 }
+
+@media (max-width: 480px) {
+  html, body {
+    min-height: 100vh;
+  }
+  
+  /* HIDE only the Up Next queue list, keep Session Stats visible */
+  .queue-header {
+    display: none !important;
+  }
+  
+  .queue-list-container {
+    display: none !important;
+  }
+  
+  /* Ensure Session Stats are properly styled in small screens */
+  .player-stats-section {
+    min-height: 220px !important;
+    padding: 24px 0 !important;
+  }
+  
+  .stats-title {
+    font-size: 15px !important;
+    margin-bottom: 18px !important;
+  }
+  
+  .stat-item {
+    padding: 18px 16px !important;
+    margin-bottom: 14px !important;
+    min-height: 68px !important;
+  }
+  
+  .stat-item i {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  
+  .stat-label {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+  }
+  
+  .stat-value {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+  }
+  
+  .album-artwork-wrapper {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .current-track-title {
+    font-size: 18px;
+  }
+  
+  .control-button {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .control-button i {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .play-btn-main {
+    width: 58px;
+    height: 58px;
+  }
+  
+  .play-btn-inner i {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .control-buttons-group {
+    gap: 14px;
+  }
+}
+
 @media (max-width: 480px) {
 .album-artwork-wrapper {
 width: 200px;
@@ -1412,26 +1551,251 @@ gap: 14px;
     min-height: 100vh;
   }
   
-  .sidebar-queue {
-    min-height: 480px; /* Even more height for very small screens */
+  /* HIDE only the Up Next queue list, keep Session Stats visible */
+  .queue-header {
+    display: none !important;
   }
   
   .queue-list-container {
-    min-height: 220px;
-    max-height: 300px;
+    display: none !important;
   }
   
+  /* Ensure Session Stats are properly styled in small screens */
   .player-stats-section {
-    min-height: 420px;
-   padding-bottom:50px;
+    min-height: 220px !important;
+    padding: 24px 0 !important;
+  }
+  
+  .stats-title {
+    font-size: 15px !important;
+    margin-bottom: 18px !important;
   }
   
   .stat-item {
     padding: 18px 16px !important;
+    margin-bottom: 14px !important;
     min-height: 68px !important;
+  }
+  
+  .stat-item i {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  
+  .stat-label {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+  }
+  
+  .stat-value {
+    font-size: 16px !important;
+    font-weight: 800 !important;
   }
   
 .album-artwork-wrapper {
 width: 200px;
 height: 200px;
+}
+}
+
+
+/* Equalizer Slider Styles */
+.eq-slider-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 50px;
+  flex-shrink: 0;
+}
+
+.eq-slider {
+  -webkit-appearance: slider-vertical;
+  writing-mode: bt-lr; /* For IE */
+  -webkit-writing-mode: bt-lr;
+  writing-mode: vertical-lr;
+  width: 8px;
+  height: 180px;
+  background: var(--card-bg);
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  transform: rotate(180deg);
+}
+.eq-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  cursor: pointer;
+  box-shadow: var(--shadow-md), var(--glow-primary);
+  border: 2px solid var(--text-primary);
+}
+
+.eq-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  cursor: pointer;
+  box-shadow: var(--shadow-md), var(--glow-primary);
+  border: 2px solid var(--text-primary);
+}
+
+.eq-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.eq-slider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+}
+
+.eq-value {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary-color);
+  min-width: 50px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.eq-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Mobile Responsive for Equalizer */
+@media (max-width: 768px) {
+  .modal-content {
+    max-width: 95%;
+    padding: 20px;
+    max-height: 85vh;
+  }
+  
+  .modal-header h3 {
+    font-size: 18px;
+  }
+  
+  .eq-presets {
+    gap: 8px;
+  }
+  
+  .eq-preset-btn {
+    flex: 1 1 calc(50% - 4px);
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .eq-sliders {
+    gap: 10px;
+    padding: 15px 5px;
+    justify-content: flex-start;
+  }
+  
+  .eq-slider-container {
+    min-width: 45px;
+  }
+  
+  .eq-slider {
+    height: 140px;
+    width: 7px;
+  }
+  
+  .eq-slider::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .eq-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .eq-value {
+    font-size: 10px;
+    min-width: 45px;
+  }
+  
+  .eq-label {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    max-width: 100%;
+    padding: 16px;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+  
+  .modal-header {
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .modal-header h3 {
+    font-size: 16px;
+  }
+  
+  .eq-presets {
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  
+  .eq-preset-btn {
+    flex: 1 1 calc(50% - 3px);
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+  
+  .eq-sliders {
+    gap: 8px;
+    padding: 12px 5px;
+    justify-content: flex-start;
+  }
+  
+  .eq-slider-container {
+    min-width: 40px;
+  }
+  
+  .eq-slider {
+    height: 120px;
+    width: 6px;
+  }
+  
+  .eq-slider::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .eq-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .eq-value {
+    font-size: 9px;
+    min-width: 40px;
+  }
+  
+  .eq-label {
+    font-size: 9px;
+  }
+}
+
+/* Landscape mobile view */
+@media (max-width: 768px) and (orientation: landscape) {
+  .modal-content {
+    max-height: 95vh;
+  }
+  
+  .eq-slider {
+    height: 100px;
+  }
 }
