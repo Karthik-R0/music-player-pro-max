@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Premium Music Player</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- jsmediatags for ID3 tags -->
+  <script src="https://cdn.jsdelivr.net/npm/jsmediatags@3.9.5/dist/jsmediatags.min.js"></script>
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="animated-bg">
+    <div class="bg-circle circle-1"></div>
+    <div class="bg-circle circle-2"></div>
+    <div class="bg-circle circle-3"></div>
+    <div class="bg-circle circle-4"></div>
+  </div>
+  
+  <div class="app-wrapper">
+    <!-- Header with Glass Effect -->
+    <header class="glass-header">
+      <div class="header-left">
+        <div class="logo-container">
+          <div class="logo-icon-wrapper">
+            <i data-lucide="headphones" class="logo-icon"></i>
+          </div>
+          <div class="logo-text">
+            <h1>Music<span>Pro</span></h1>
+            <p class="logo-subtitle">Premium Player</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button id="folderBtn" class="action-btn btn-primary" title="Load Folder">
+          <i data-lucide="folder-open"></i>
+          <span>Folder</span>
+        </button>
+        <label class="action-btn btn-secondary">
+          <i data-lucide="plus-circle"></i>
+          <span>Add</span>
+          <input id="fileInput" type="file" accept="audio/*" multiple style="display: none;">
+        </label>
+        <button id="clearList" class="action-btn btn-danger" title="Clear All">
+          <i data-lucide="trash-2"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+      <!-- Left Sidebar - Playlist -->
+      <aside class="sidebar-playlist">
+        <div class="playlist-header-section">
+          <div class="playlist-title-row">
+            <div class="title-with-icon">
+              <i data-lucide="disc-album" class="section-icon"></i>
+              <h2>Your Library</h2>
+            </div>
+            <div class="playlist-badge">
+              <span id="trackCount">0</span>
+            </div>
+          </div>
+          
+          <div class="playlist-meta">
+            <i data-lucide="clock" class="meta-icon"></i>
+            <span id="totalDuration">0:00:00</span>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-wrapper">
+          <div class="search-input-group">
+            <i data-lucide="search" class="search-icon-left"></i>
+            <input type="text" id="searchInput" placeholder="Search your music..." />
+            <button id="clearSearch" class="search-clear-btn">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sort and Filter Options -->
+        <div class="filter-options">
+          <button class="filter-btn active" data-sort="default">
+            <i data-lucide="list"></i>
+            <span>Default</span>
+          </button>
+          <button class="filter-btn" data-sort="name">
+            <i data-lucide="arrow-up-a-z"></i>
+            <span>Name</span>
+          </button>
+          <button class="filter-btn" data-sort="duration">
+            <i data-lucide="timer"></i>
+            <span>Duration</span>
+          </button>
+        </div>
+
+        <!-- Drop Zone -->
+        <div id="dropZone" class="modern-drop-zone">
+          <div class="drop-content">
+            <i data-lucide="cloud-upload" class="drop-icon-large"></i>
+            <h3>Drop Music Here</h3>
+            <p>Support MP3, WAV, OGG, M4A formats</p>
+          </div>
+        </div>
+
+        <!-- Playlist Container -->
+        <div class="playlist-scroll-container">
+          <ul id="playlist" class="modern-playlist"></ul>
+        </div>
+      </aside>
+
+      <!-- Center - Main Player -->
+      <main class="main-player-section">
+        <!-- Album Art and Track Info -->
+        <div class="player-display-area">
+          <div class="album-artwork-wrapper">
+            <div class="album-art-inner" id="albumArtInner">
+              <div class="default-artwork">
+                <i data-lucide="music" class="default-music-icon"></i>
+              </div>
+            </div>
+            <div class="artwork-glow" id="artworkGlow"></div>
+          </div>
+
+          <div class="track-info-section">
+            <h2 id="trackTitle" class="current-track-title">No Track Selected</h2>
+            <p id="trackArtist" class="current-track-artist">Select a track to begin</p>
+            <p id="trackAlbum" class="current-track-album"></p>
+          </div>
+        </div>
+
+        <!-- Progress Bar Section -->
+        <div class="progress-control-section">
+          <div class="time-display">
+            <span id="currentTime" class="time-text">0:00</span>
+          </div>
+          
+          <div class="progress-bar-wrapper">
+            <div class="progress-track">
+              <div class="progress-filled" id="progressFilled"></div>
+              <div class="progress-handle" id="progressHandle"></div>
+            </div>
+            <input id="progressBar" type="range" min="0" max="100" value="0" class="progress-input" />
+          </div>
+          
+          <div class="time-display">
+            <span id="totalTime" class="time-text">0:00</span>
+          </div>
+        </div>
+
+        <!-- Player Controls -->
+        <div class="player-controls-section">
+          <div class="control-buttons-group">
+            <button id="shuffleBtn" class="control-button shuffle-btn" title="Shuffle">
+              <i data-lucide="shuffle"></i>
+            </button>
+            
+            <button id="prevBtn" class="control-button nav-btn" title="Previous">
+              <i data-lucide="skip-back"></i>
+            </button>
+            
+            <button id="playPauseBtn" class="control-button play-btn-main" title="Play">
+              <div class="play-btn-inner">
+                <i data-lucide="play"></i>
+              </div>
+            </button>
+            
+            <button id="nextBtn" class="control-button nav-btn" title="Next">
+              <i data-lucide="skip-forward"></i>
+            </button>
+            
+            <button id="repeatBtn" class="control-button repeat-btn" title="Repeat">
+              <i data-lucide="repeat"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Additional Controls Row -->
+        <div class="additional-controls-row">
+          <!-- Volume Control -->
+          <div class="volume-control-group">
+            <button id="volumeBtn" class="icon-btn-control">
+              <i data-lucide="volume-2" id="volumeIcon"></i>
+            </button>
+            <div class="volume-slider-wrapper">
+              <input id="volumeSlider" type="range" min="0" max="100" value="80" class="volume-range" />
+              <div class="volume-fill" id="volumeFill"></div>
+            </div>
+            <span class="volume-percentage" id="volumePercentage">80%</span>
+          </div>
+
+          <!-- Playback Speed -->
+          <div class="speed-control-group">
+            <i data-lucide="gauge" class="speed-icon"></i>
+            <select id="speedControl" class="speed-select">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1" selected>1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="2">2x</option>
+            </select>
+          </div>
+
+          <!-- Equalizer Button -->
+          <button id="equalizerBtn" class="icon-btn-control" title="Equalizer">
+            <i data-lucide="sliders-horizontal"></i>
+          </button>
+        </div>
+
+        <!-- Visualizer Section -->
+        <div class="visualizer-section">
+          <canvas id="visualizerCanvas" class="visualizer-canvas"></canvas>
+          <div class="visualizer-overlay">
+            <div class="frequency-bars" id="frequencyBars">
+              <span class="freq-bar"></span>
+              <span class="freq-bar"></span>
+              <span class="freq-bar"></span>
+              <span class="freq-bar"></span>
+              <span class="freq-bar"></span>
+              <span class="freq-bar"></span>
+              <span class="freq-bar"></span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Right Sidebar - Queue & Stats -->
+      <aside class="sidebar-queue">
+        <div class="queue-header">
+          <i data-lucide="list-music" class="queue-icon"></i>
+          <h3>Up Next</h3>
+        </div>
+        
+        <div class="queue-list-container" id="queueList">
+          <div class="queue-empty-state">
+            <i data-lucide="list-x" class="empty-icon"></i>
+            <p>No upcoming tracks</p>
+          </div>
+        </div>
+
+        <!-- Player Stats -->
+        <div class="player-stats-section">
+          <h4 class="stats-title">Session Stats</h4>
+          <div class="stat-item">
+            <i data-lucide="play-circle"></i>
+            <div class="stat-content">
+              <span class="stat-label">Played</span>
+              <span class="stat-value" id="tracksPlayed">0</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <i data-lucide="clock"></i>
+            <div class="stat-content">
+              <span class="stat-label">Listening Time</span>
+              <span class="stat-value" id="listeningTime">0m</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Hidden Audio Element -->
+  <audio id="audio" preload="metadata"></audio>
+
+  <!-- Equalizer Modal -->
+  <div id="equalizerModal" class="modal-overlay">
+    <div class="modal-content equalizer-modal">
+      <div class="modal-header">
+        <h3>Equalizer</h3>
+        <button class="modal-close-btn" id="closeEqualizer">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="equalizer-controls">
+        <div class="eq-presets">
+          <button class="eq-preset-btn active" data-preset="flat">Flat</button>
+          <button class="eq-preset-btn" data-preset="pop">Pop</button>
+          <button class="eq-preset-btn" data-preset="rock">Rock</button>
+          <button class="eq-preset-btn" data-preset="jazz">Jazz</button>
+          <button class="eq-preset-btn" data-preset="classical">Classical</button>
+        </div>
+        <div class="eq-sliders" id="eqSliders">
+          <!-- EQ sliders will be generated dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
